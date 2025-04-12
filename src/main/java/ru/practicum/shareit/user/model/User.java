@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import ru.practicum.shareit.validators.Add;
 import ru.practicum.shareit.validators.Update;
 
@@ -12,7 +11,6 @@ import ru.practicum.shareit.validators.Update;
  * TODO Sprint add-controllers.
  */
 @Data
-@EqualsAndHashCode()
 public class User {
     @NotNull(groups = {Update.class}, message = "Id is empty")
     private Long id;
