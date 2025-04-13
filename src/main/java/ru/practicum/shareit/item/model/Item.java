@@ -6,9 +6,6 @@ import lombok.Data;
 import ru.practicum.shareit.validators.Add;
 import ru.practicum.shareit.validators.Update;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 public class Item {
     @NotNull(groups = {Update.class}, message = "Id отсутствует")

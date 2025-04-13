@@ -7,9 +7,6 @@ import lombok.EqualsAndHashCode;
 import ru.practicum.shareit.validators.Add;
 import ru.practicum.shareit.validators.Update;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @EqualsAndHashCode()
 public class UserDto {
