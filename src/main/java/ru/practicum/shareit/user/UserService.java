@@ -1,19 +1,21 @@
 package ru.practicum.shareit.user;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.UserDto.UserDto;
-
 
 import java.util.List;
 
 public interface UserService {
+    @Transactional
+    UserDto create(UserDto dto);
 
-    public UserDto save(UserDto user);
+    @Transactional
+    UserDto update(UserDto dto, Long id);
 
-    public UserDto update(UserDto user, Long id);
+    @Transactional
+    void delete(Long id);
+
+    List<UserDto> findAll();
 
     UserDto findById(Long id);
-
-    public void delete(Long id);
-
-    public List<UserDto> getAll();
 }

@@ -3,7 +3,10 @@ package ru.practicum.shareit.item.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.validators.Add;
+
+import java.util.List;
 
 @Data
 public class ItemDto {
@@ -14,6 +17,10 @@ public class ItemDto {
     private String description;
     @NotNull(groups = {Add.class}, message = "Available отсутствует")
     private Boolean available;
-    private Long owner;
-    private Long request;
+    BookingDtoResponse lastBooking;
+
+    BookingDtoResponse nextBooking;
+
+    List<CommentDtoResponse> comments;
+
 }
