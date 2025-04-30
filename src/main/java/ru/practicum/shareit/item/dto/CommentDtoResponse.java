@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.dto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 public class CommentDtoResponse {
     Long id;
     String text;
-    Item item;
+    ItemDto item;
     String authorName;
     LocalDateTime created;
 }

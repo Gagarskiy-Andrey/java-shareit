@@ -1,44 +1,38 @@
 package ru.practicum.shareit.booking;
 
-import lombok.experimental.UtilityClass;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@UtilityClass
-public class BookingMapper {
-    public Booking mapDtoToNewBooking(BookingDtoRequest dto, User user, Item item) {
-        Booking booking = new Booking();
-        booking.setStatus(Status.WAITING);
-        booking.setUser(user);
-        booking.setItem(item);
-        booking.setStart(dto.getStart());
-        booking.setEnd(dto.getEnd());
-        return booking;
-    }
+@Mapper(componentModel = "spring")
+public interface BookingMapper {
 
-    public BookingDtoResponse mapBookingToDto(Booking booking) {
-        BookingDtoResponse dto = new BookingDtoResponse();
-        dto.setId(booking.getId());
-        dto.setStatus(booking.getStatus());
-        dto.setBooker(booking.getUser());
-        dto.setItem(booking.getItem());
-        dto.setStart(booking.getStart());
-        dto.setEnd(booking.getEnd());
-        return dto;
-    }
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "status", constant = "WAITING"),
+            @Mapping(target = "user", source = "user"),
+            @Mapping(target = "item", source = "item"),
+            @Mapping(target = "start", source = "dto.start"),
+            @Mapping(target = "end", source = "dto.end")
+    })
+    Booking mapDtoToNewBooking(BookingDtoRequest dto, User user, Item item);
 
-    public static List<BookingDtoResponse> mapBookingToDto(Iterable<Booking> bookings) {
-        List<BookingDtoResponse> dtos = new ArrayList<>();
-        for (Booking booking : bookings) {
-            dtos.add(mapBookingToDto(booking));
-        }
-        return dtos;
-    }
+    @Mappings({
+            @Mapping(target = "id", source = "booking.id"),
+            @Mapping(target = "status", source = "booking.status"),
+            @Mapping(target = "booker", source = "booking.user"),
+            @Mapping(target = "item", source = "booking.item"),
+            @Mapping(target = "start", source = "booking.start"),
+            @Mapping(target = "end", source = "booking.end")
+    })
+    BookingDtoResponse mapBookingToDto(Booking booking);
+
+    List<BookingDtoResponse> mapBookingToDtoList(List<Booking> bookings);
 }

@@ -32,13 +32,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class DbItemServiceImpl implements ItemService {
+public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
+    private final BookingMapper bookingMapper;
+    private final CommentMapper commentMapper;
 
     @Override
     @Transactional
@@ -65,9 +67,11 @@ public class DbItemServiceImpl implements ItemService {
         if (bookings.isEmpty()) {
             throw new ValidationException("Пользователь " + userId + " не брал в аренду вещь " + itemId);
         }
+        Comment comment = commentMapper.mapDtoToComment(dto, owner, item);
+        comment.setCreated(LocalDateTime.now());
+        commentRepository.save(comment);
 
-        Comment comment = commentRepository.save(CommentMapper.mapDtoToComment(dto, owner, item));
-        return CommentMapper.mapCommentToDto(comment);
+        return commentMapper.mapCommentToDto(comment);
     }
 
     @Override
@@ -117,16 +121,16 @@ public class DbItemServiceImpl implements ItemService {
         List<Booking> lastBookings = bookingRepository.findAllByItemIdAndEndBeforeAndStatusOrderByEndDesc(itemId,
                 LocalDateTime.now(), Status.APPROVED);
         if (!lastBookings.isEmpty()) {
-            lastBooking = BookingMapper.mapBookingToDto(lastBookings.get(0));
+            lastBooking = bookingMapper.mapBookingToDto(lastBookings.get(0));
         }
 
         List<Booking> nextBookings = bookingRepository.findAllByItemIdAndStartAfterOrderByStartAsc(itemId,
                 LocalDateTime.now());
         if (!nextBookings.isEmpty()) {
-            nextBooking = BookingMapper.mapBookingToDto(nextBookings.get(0));
+            nextBooking = bookingMapper.mapBookingToDto(nextBookings.get(0));
         }
 
-        List<CommentDtoResponse> comments = CommentMapper.mapCommentToDto(commentRepository.findAllByItemId(itemId));
+        List<CommentDtoResponse> comments = commentMapper.mapCommentToDto(commentRepository.findAllByItemId(itemId));
 
         return itemMapper.mapItemToDto(item, lastBooking, nextBooking, comments);
     }
@@ -145,7 +149,7 @@ public class DbItemServiceImpl implements ItemService {
         Map<Long, List<CommentDtoResponse>> commentsGroup = comments
                 .stream()
                 .collect(Collectors.groupingBy(comment -> comment.getItem().getId(),
-                        Collectors.mapping(CommentMapper::mapCommentToDto, Collectors.toList())));
+                        Collectors.mapping(commentMapper::mapCommentToDto, Collectors.toList())));
 
         return items
                 .stream()
@@ -155,13 +159,13 @@ public class DbItemServiceImpl implements ItemService {
                             .stream()
                             .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
                             .reduce((first, second) -> second)
-                            .map(BookingMapper::mapBookingToDto)
+                            .map(bookingMapper::mapBookingToDto)
                             .orElse(null);
                     BookingDtoResponse bookingNext = bookingList
                             .stream()
                             .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                             .findFirst()
-                            .map(BookingMapper::mapBookingToDto)
+                            .map(bookingMapper::mapBookingToDto)
                             .orElse(null);
 
                     return itemMapper.mapItemToDto(item, bookingLast, bookingNext,

@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class DbBookingServiceImpl implements BookingService {
+public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final BookingMapper bookingMapper;
 
     @Override
     @Transactional
@@ -46,11 +46,12 @@ public class DbBookingServiceImpl implements BookingService {
             throw new ValidationException("Вещь " + item.getId() + " недоступна для бронирования");
         }
 
-        Booking booking = bookingRepository.save(BookingMapper.mapDtoToNewBooking(dto, user, item));
-        return BookingMapper.mapBookingToDto(booking);
+        Booking booking = bookingRepository.save(bookingMapper.mapDtoToNewBooking(dto, user, item));
+        return bookingMapper.mapBookingToDto(booking);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDtoResponse approve(Long bookingId, Boolean status, Long userId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()
                 -> new NotFoundException("Бронирование с id = " + bookingId + " не найдено"));
@@ -72,20 +73,22 @@ public class DbBookingServiceImpl implements BookingService {
         }
 
         bookingRepository.save(booking);
-        return BookingMapper.mapBookingToDto(booking);
+        return bookingMapper.mapBookingToDto(booking);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDtoResponse findById(Long bookingId, Long userId) {
         userRepository.findById(userId).orElseThrow(()
                 -> new NotFoundException("Пользователь " + userId + " не найден"));
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()
                 -> new NotFoundException("Бронирование " + bookingId + " не найдено"));
-        return BookingMapper.mapBookingToDto(booking);
+        return bookingMapper.mapBookingToDto(booking);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDtoResponse> findAllByUser(Long userId, State state) {
         userRepository.findById(userId).orElseThrow(()
                 -> new NotFoundException("Пользователь " + userId + " не найден"));
@@ -100,10 +103,11 @@ public class DbBookingServiceImpl implements BookingService {
             default -> bookingRepository.findAllByUserId(userId);
         };
 
-        return BookingMapper.mapBookingToDto(result);
+        return bookingMapper.mapBookingToDtoList(result);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDtoResponse> findAllByUserItems(Long userId, State state) {
         userRepository.findById(userId).orElseThrow(()
                 -> new NotFoundException("Пользователь " + userId + " не найден"));
@@ -127,7 +131,7 @@ public class DbBookingServiceImpl implements BookingService {
 
         return bookings
                 .stream()
-                .map(BookingMapper::mapBookingToDto)
+                .map(bookingMapper::mapBookingToDto)
                 .collect(Collectors.toList());
     }
 }
