@@ -1,21 +1,31 @@
 package ru.practicum.shareit.user.model;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ru.practicum.shareit.validators.Add;
-import ru.practicum.shareit.validators.Update;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
+@Entity
+@Table(name = "users")
 @Data
-@EqualsAndHashCode()
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
-    @NotNull(groups = {Update.class}, message = "Id is empty")
-    private Long id;
-    @NotBlank(groups = {Add.class}, message = "Name can not be blank")
-    private String name;
-    @NotBlank(groups = {Add.class}, message = "Email can not be blank")
-    @Email(groups = {Add.class, Update.class}, message = "Email uncorrected")
-    private String email;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    @Column(unique = true, nullable = false)
+
+    String email;
+
+    @Column(nullable = false)
+    String name;
 }

@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -34,7 +34,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@Validated(Add.class) @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDto));
     }
 
     @PatchMapping("/{id}")
